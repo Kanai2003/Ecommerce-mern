@@ -1,6 +1,6 @@
-import mongoose from "mongoose";
+import mongoose,{ Schema } from "mongoose";
 
-const schema = new mongoose.Schema(
+const schema = new Schema(
   {
     shippingInfo: {
       address: {
@@ -27,7 +27,7 @@ const schema = new mongoose.Schema(
 
     user: {
       type: String,
-      ref: "User",
+      // ref: "User",
       required: true,
     },
 

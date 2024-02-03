@@ -26,12 +26,14 @@ export const nodeCache = new NodeCache()
 import HealthRouter from "./routes/health.routes.js"
 import UserRouter from "./routes/user.routes.js"
 import ProduRouter from "./routes/product.routes.js"
+import OrderRouter from "./routes/order.routes.js"
 
 
 // routes declaration
 app.use("/api/v1/health", HealthRouter)
 app.use("/api/v1/user", UserRouter)
 app.use("/api/v1/product", ProduRouter)
+app.use("/api/v1/order", OrderRouter)
 
 
 
