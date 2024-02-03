@@ -1,56 +1,57 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import validator from "validator";
 
 interface IUser extends Document {
-    username: string;
-    name: string;
-    email: string;
-    photo: string;
-    role: "user" | "admin";
-    gender: "male" | "female" | "others";
-    dob: Date;
-    createdAt: Date;
-    updatedAt: Date;
-    // virtual attribut
-    age: number;
+  _id: string;
+  name: string;
+  email: string;
+  photo: string;
+  role: "admin" | "user";
+  gender: "male" | "female";
+  dob: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  //   Virtual Attribute
+  age: number;
 }
 
-const userSchema = new mongoose.Schema(
+const userSchema = new Schema(
     {
-        username: {
-            type: String,
-            unique: [true, "username already exists"],
-            required: [true, "Please Enter username"]
+        _id: {
+          type: String,
+          required: [true, "Please enter ID"],
         },
         name: {
-            type: String,
-            required: [true, "Please Enter Name"]
+          type: String,
+          required: [true, "Please enter Name"],
         },
         email: {
-            type: String,
-            unique: [true, "Email already Exist"],
-            required: [true, "Please enter Name"],
-            validate: validator.default.isEmail,
+          type: String,
+          unique: [true, "Email already Exist"],
+          required: [true, "Please enter Name"],
+          validate: validator.default.isEmail,
         },
         photo: {
-            type: String
+          type: String,
         },
         role: {
-            type: String,
-            enum: ["user", "admin"],
-            default: "user"
+          type: String,
+          enum: ["admin", "user"],
+          default: "user",
         },
         gender: {
-            type: String,
-            enum: ["male", "female", "others"],
-            required: [true, "Please enter Gender"],
+          type: String,
+          enum: ["male", "female"],
+          required: [true, "Please enter Gender"],
         },
         dob: {
-            type: Date,
-            required: [true, "Please enter date of birth"]
-        }
-
-    }, { timestamps: true }
+          type: Date,
+          required: [true, "Please enter Date of birth"],
+        },
+      },
+      {
+        timestamps: true,
+      }
 )
 
 // calculate age attribute virtually
