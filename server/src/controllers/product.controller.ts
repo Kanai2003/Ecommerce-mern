@@ -7,6 +7,8 @@ import { Product } from "../models/product.model.js";
 import { BaseQuery, NewProductRequestBody, SearchRequestQuery } from "../types/types.js"
 import { rm } from "fs";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import { nodeCache } from "../app.js";
+import { invalidateCache } from "../utils/features.js";
 
 
 // add new product
@@ -47,11 +49,18 @@ export const newProduct = asyncHandler(async (
 
 // get a single product by its id
 export const getProduct = asyncHandler(async (req, res) => {
-    const id = req.params.id
-    const product = await Product.findById(id)
+    let product;
+    const id = req.params.id;
+    if (nodeCache.has(`product-${id}`)) {
+        product = JSON.parse(nodeCache.get(`product-${id}`) as string);
+    } else {
+        product = await Product.findById(id);
 
-    if (!product) {
-        throw new ApiError(404, "Product not found!")
+        if (!product) {
+            throw new ApiError(404, "Product not found!")
+        }
+
+        nodeCache.set(`product-${id}`, JSON.stringify(product));
     }
 
     return res
@@ -94,7 +103,11 @@ export const updateProduct = asyncHandler(async (req, res, next) => {
 
     await product.save()
 
-    // TODO: add invalidate cache
+    invalidateCache({
+        product: true,
+        productId: String(product._id),
+        admin: true,
+    });
 
     const updatedProduct = await Product.findById(product._id)
 
@@ -116,7 +129,11 @@ export const deleteProduct = asyncHandler(async (req, res) => {
 
     await product.deleteOne()
 
-    // TODO : add invalidator
+    invalidateCache({
+        product: true,
+        productId: String(product._id),
+        admin: true,
+    });
 
     return res
         .status(200)
@@ -126,7 +143,16 @@ export const deleteProduct = asyncHandler(async (req, res) => {
 
 // get latest product
 export const latestProduct = asyncHandler(async (req, res) => {
-    const products = await Product.find({}).sort({ createdAt: -1 }).limit(10);
+    // const products = await Product.find({}).sort({ createdAt: -1 }).limit(10)
+
+    let products;
+
+    if (nodeCache.has("latest-products")) {
+        products = JSON.stringify(nodeCache.get("latest-products") as string)
+    } else {
+        products = await Product.find({}).sort({ createdAt: -1 }).limit(5);
+        nodeCache.set("latest-products", JSON.stringify(products))
+    }
 
     return res
         .status(200)
@@ -137,7 +163,16 @@ export const latestProduct = asyncHandler(async (req, res) => {
 
 // get all categories
 export const allCategories = asyncHandler(async (req, res) => {
-    const categories = await Product.distinct("category")
+    // const categories = await Product.distinct("category")
+
+    let categories;
+
+    if (nodeCache.has("categories")) {
+        categories = JSON.parse(nodeCache.get("categories") as string);
+    } else {
+        categories = await Product.distinct("category");
+        nodeCache.set("categories", JSON.stringify(categories));
+    }
 
     return res
         .status(200)
@@ -159,25 +194,25 @@ export const getAllProducts = asyncHandler(async (
 
     const baseQuery: BaseQuery = {}
 
-    if(search){
+    if (search) {
         baseQuery.name = {
             $regex: search,
             $options: "i"
         }
     }
 
-    if(price){
+    if (price) {
         baseQuery.price = {
             $lte: Number(price)
         }
     }
 
-    if(category){
+    if (category) {
         baseQuery.category = category
     }
 
     const productPromise = await Product.find(baseQuery)
-        .sort(sort && { price: sort==="asc"?1:-1})
+        .sort(sort && { price: sort === "asc" ? 1 : -1 })
         .limit(limit)
         .skip(skip)
 
@@ -186,9 +221,9 @@ export const getAllProducts = asyncHandler(async (
         Product.find(baseQuery)
     ])
 
-    const totalPage = Math.ceil(filteredOnlyProduct.length/limit)
+    const totalPage = Math.ceil(filteredOnlyProduct.length / limit)
 
     return res
         .status(200)
-        .json(new ApiResponse(200, {products, totalPage}, "Product fetched successfully!"))
+        .json(new ApiResponse(200, { products, totalPage }, "Product fetched successfully!"))
 })
