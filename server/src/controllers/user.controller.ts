@@ -4,24 +4,29 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { User } from "../models/user.model.js";
-
+import { NewUserRequestBody } from "../types/types.js"
+import {uploadOnCloudinary} from "../utils/cloudinary.js"
 
 
 // user register
-const register = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const { username, name, email, gender, dob, photo } = req.body
+export const register = asyncHandler(async (
+    req: Request<{}, {}, NewUserRequestBody>,
+    res: Response,
+    next: NextFunction
+) => {
+    const { _id, name, email, gender, dob, photo } = req.body
 
-    if (!(username || name || email || gender || dob)) {
+    if (!(_id || name || email || gender || dob)) {
         throw new ApiError(401, "All fields are required!")
     }
 
-    const findUser = await User.findOne({ $or: [{ username }, { email }] })
+    const findUser = await User.findOne({ $or: [{ _id }, { email }] })
     if (findUser) {
         throw new ApiError(400, "ID already exists!")
     }
 
     const user = await User.create({
-        username,
+        _id,
         name,
         email,
         gender,
@@ -40,9 +45,9 @@ const register = asyncHandler(async (req: Request, res: Response, next: NextFunc
         .json(new ApiResponse(200, { createdUser }, "User created successfully!"))
 })
 
-
+// fix: this route is not working 
 // get all user
-const getAllUser = asyncHandler(async (req: Request, res: Response) => {
+export const getAllUser = asyncHandler(async (req: Request, res: Response) => { 
     const users = await User.find({})
 
     if (!users) {
@@ -55,7 +60,7 @@ const getAllUser = asyncHandler(async (req: Request, res: Response) => {
 })
 
 // get user by id
-const getUser = asyncHandler(async (req: Request, res: Response) => {
+export const getUser = asyncHandler(async (req: Request, res: Response) => {
     const id = req.params.id
 
     const user = await User.findById(id)
@@ -70,27 +75,19 @@ const getUser = asyncHandler(async (req: Request, res: Response) => {
 })
 
 // delete user
-const deleteUser = asyncHandler( async (req: Request, res: Response)=> {
+export const deleteUser = asyncHandler(async (req: Request, res: Response) => {
     const id = req.params.id
     const user = await User.findById(id)
 
-    if(!user){
-        throw  new ApiError(404, "User not found!")
+    if (!user) {
+        throw new ApiError(404, "User not found!")
     }
 
     await user.deleteOne();
 
     return res
-            .status(200)
-            .json(new ApiResponse(200, {}, "User deleted Successfully!"))
+        .status(200)
+        .json(new ApiResponse(200, {}, "User deleted Successfully!"))
 })
 
 
-
-
-export {
-    register,
-    getAllUser,
-    getUser,
-    deleteUser
-}

@@ -7,13 +7,20 @@ import {
 } from "../controllers/user.controller.js"
 import { adminOnly } from "../middlewares/auth.middleware.js";
 
+
 const router = Router()
 
-router
-    .post("/new", register)
-    .get("/:id", getUser)
-    .delete("/:id", deleteUser)
+router.post("/new", register)
+    
 
-router.get("/all", adminOnly, getAllUser)
+router.route("/getall").get(adminOnly, getAllUser)
+
+router
+    .route("/:id")
+    .get( getUser)
+    .delete( deleteUser)
+
+
+
 
 export default router

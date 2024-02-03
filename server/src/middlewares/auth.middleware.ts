@@ -4,7 +4,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user.model.js";
 
 const adminOnly = asyncHandler( async (req: Request, res: Response, next: NextFunction) => {
-    const { id } = req.query
+    const  id  = req.query.id
 
     if(!id){
         throw new ApiError(401, "Login first to access!")
