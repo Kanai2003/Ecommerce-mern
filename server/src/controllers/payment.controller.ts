@@ -4,7 +4,25 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { Coupon } from "../models/coupon.model.js";
+import { stripe } from "../app.js";
 
+export const createPaymentIntent = asyncHandler(async (req, res) => {
+    const { amount } = req.body
+
+    if(!amount){
+        throw new ApiError(400, "Please enter amount!")
+    }
+
+    const paymentIntent = await stripe.paymentIntents.create({
+        amount: Number(amount)*100,
+        currency: "inr"
+    })
+    // instead of paymentIntent object sending only client_secret to frontend
+    const client_secret = paymentIntent.client_secret
+    return res
+        .status(200)
+        .json(new ApiResponse(200, {client_secret}, "Success!"))
+})
 
 export const newCoupon = asyncHandler(async (req, res)=> {
     const { code, amount } = req.body

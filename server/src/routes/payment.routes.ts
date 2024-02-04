@@ -4,13 +4,14 @@ import {
     newCoupon,
     applyDiscount,
     allCoupons,
-    deleteCoupon
+    deleteCoupon,
+    createPaymentIntent
 } from "../controllers/payment.controller.js"
 
 const router = Router()
 
 
-// router.post("/create", createPaymentIntent);
+router.post("/create", createPaymentIntent);
 
 router.get("/discount", applyDiscount);
 
