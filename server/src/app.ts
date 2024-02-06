@@ -2,7 +2,8 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import NodeCache from "node-cache"
-import Stripe  from "stripe"; 
+import Stripe  from "stripe";
+import morgan from "morgan"
 
 
 const app = express();
@@ -13,7 +14,7 @@ app.use(
         credentials: true,
     }),
 );
-
+app.use(morgan("dev"))
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
