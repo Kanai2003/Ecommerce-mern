@@ -52,7 +52,7 @@ export const newOrder = asyncHandler(async (
         order: true,
         admin: true,
         userId: user,
-        productId: order.orderItems.map((i) => String(i.productId)),
+        productId: order.orderItems?.map((i) => String(i.productId)),
     })
 
     return res

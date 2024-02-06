@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import mongoose from "mongoose";
+import mongoose, { model } from "mongoose";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
@@ -19,7 +19,7 @@ export const newProduct = asyncHandler(async (
 ) => {
     const { name, category, price, stock } = req.body
     const localphoto = req.file?.path
-    const photo = await uploadOnCloudinary(localphoto)
+    const photo: any = await uploadOnCloudinary(localphoto)
 
 
     if (!photo) {
@@ -226,4 +226,19 @@ export const getAllProducts = asyncHandler(async (
     return res
         .status(200)
         .json(new ApiResponse(200, { products, totalPage }, "Product fetched successfully!"))
+})
+
+// Revalidate on New,Update,Delete Product & on New Order
+export const getAdminProducts = asyncHandler(async (req, res) => {
+    let products;
+    const key = "all-products"
+    if (nodeCache.has(key)){
+        products = JSON.parse(nodeCache.get(key) as string);
+    } else {
+        products = await Product.find({});
+        nodeCache.set(key, JSON.stringify(products));
+    }
+    return res
+        .status(200)
+        .json(new ApiResponse(200, { products }, "Product fetched successfully!"))
 })

@@ -3,9 +3,10 @@ import { NextFunction, Request, Response } from "express";
 export interface NewUserRequestBody {
   name: string;
   email: string;
-  photo: string;
+  photo?: string;
   gender: string;
-  _id: string;
+  username: string;
+  password: string;
   dob: Date;
 }
 

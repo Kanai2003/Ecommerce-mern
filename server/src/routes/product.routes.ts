@@ -7,7 +7,8 @@ import {
     deleteProduct,
     latestProduct,
     allCategories,
-    getAllProducts
+    getAllProducts,
+    getAdminProducts
 } from "../controllers/product.controller.js"
 import { singleUpload } from "../middlewares/multer.middleware.js";
 
@@ -21,6 +22,7 @@ router.route("/latest").get( latestProduct)
 
 router.get("/categories", allCategories)
 
+router.get("/admin-products", adminOnly, getAdminProducts)
 
 //To Create New Product  - /api/v1/product/new
 router.post("/new", adminOnly, singleUpload, newProduct)

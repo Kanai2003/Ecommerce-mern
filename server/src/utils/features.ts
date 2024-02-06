@@ -79,7 +79,7 @@ export const getInventories = async ({
     categories: string[];
     productsCount: number;
 }) => {
-    const categoriesCountPromise = categories.map((category) =>
+    const categoriesCountPromise = categories?.map((category) =>
         Product.countDocuments({ category })
     );
 
