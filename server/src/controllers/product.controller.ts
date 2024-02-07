@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import mongoose, { model } from "mongoose";
+import mongoose from "mongoose";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
@@ -19,7 +19,7 @@ export const newProduct = asyncHandler(async (
 ) => {
     const { name, category, price, stock } = req.body
     const localphoto = req.file?.path
-    const photo: any = await uploadOnCloudinary(localphoto)
+    const photo = await uploadOnCloudinary(localphoto)
 
 
     if (!photo) {
@@ -42,9 +42,10 @@ export const newProduct = asyncHandler(async (
         throw new ApiError(401, "Something went wrong while creating Product!")
     }
 
-    return res
-        .status(200)
-        .json(new ApiResponse(200, { product }, "Product created successfully!"))
+    return res.status(200).json({
+        success: true,
+        product,
+    });
 })
 
 // get a single product by its id
@@ -63,9 +64,10 @@ export const getProduct = asyncHandler(async (req, res) => {
         nodeCache.set(`product-${id}`, JSON.stringify(product));
     }
 
-    return res
-        .status(200)
-        .json(new ApiResponse(200, { product }, "Product found successfully!"))
+    return res.status(200).json({
+        success: true,
+        product,
+    });
 })
 
 // update product
@@ -111,9 +113,10 @@ export const updateProduct = asyncHandler(async (req, res, next) => {
 
     const updatedProduct = await Product.findById(product._id)
 
-    return res
-        .status(200)
-        .json(new ApiResponse(200, { updatedProduct }, "Product updated successfully!"))
+    return res.status(200).json({
+        updatedProduct,
+        message: "Product updated successfully!"
+    })
 })
 
 // delete any product 
@@ -135,9 +138,10 @@ export const deleteProduct = asyncHandler(async (req, res) => {
         admin: true,
     });
 
-    return res
-        .status(200)
-        .json(new ApiResponse(200, {}, "Product deleted successfully!"))
+    return res.status(200).json({
+        success: true,
+        message: "Product deleted successfully"
+    })
 })
 
 
@@ -154,9 +158,10 @@ export const latestProduct = asyncHandler(async (req, res) => {
         nodeCache.set("latest-products", JSON.stringify(products))
     }
 
-    return res
-        .status(200)
-        .json(new ApiResponse(200, { products }, "Latest products found successfully!"));
+    return res.status(200).json({
+        success: true,
+        products
+    })
 });
 
 
@@ -174,9 +179,10 @@ export const allCategories = asyncHandler(async (req, res) => {
         nodeCache.set("categories", JSON.stringify(categories));
     }
 
-    return res
-        .status(200)
-        .json(new ApiResponse(200, { categories }, "All categories successfully fetched!"))
+    return res.status(200).json({
+        success: true,
+        categories
+    })
 })
 
 
@@ -223,22 +229,26 @@ export const getAllProducts = asyncHandler(async (
 
     const totalPage = Math.ceil(filteredOnlyProduct.length / limit)
 
-    return res
-        .status(200)
-        .json(new ApiResponse(200, { products, totalPage }, "Product fetched successfully!"))
+    return res.status(200).json({
+        success: true,
+        products,
+        totalPage,
+    });
 })
 
+
 // Revalidate on New,Update,Delete Product & on New Order
-export const getAdminProducts = asyncHandler(async (req, res) => {
+export const getAdminProducts = asyncHandler(async (req, res, next) => {
     let products;
-    const key = "all-products"
-    if (nodeCache.has(key)){
-        products = JSON.parse(nodeCache.get(key) as string);
-    } else {
+    if (nodeCache.has("all-products"))
+        products = JSON.parse(nodeCache.get("all-products") as string);
+    else {
         products = await Product.find({});
-        nodeCache.set(key, JSON.stringify(products));
+        nodeCache.set("all-products", JSON.stringify(products));
     }
-    return res
-        .status(200)
-        .json(new ApiResponse(200, { products }, "Product fetched successfully!"))
-})
+
+    return res.status(200).json({
+        success: true,
+        products,
+    });
+});

@@ -52,12 +52,13 @@ export const newOrder = asyncHandler(async (
         order: true,
         admin: true,
         userId: user,
-        productId: order.orderItems?.map((i) => String(i.productId)),
+        productId: order.orderItems.map((i) => String(i.productId)),
     })
 
-    return res
-        .status(200)
-        .json(new ApiResponse(200, { order }, "Order Placed Successfully!"))
+    return res.status(200).json({
+        success: true,
+        order
+    })
 })
 
 // get my all orders
@@ -74,9 +75,10 @@ export const myOrders = asyncHandler(async (req, res) => {
         nodeCache.set(key, JSON.stringify(orders))
     }
 
-    return res
-        .status(200)
-        .json(new ApiResponse(200, { orders }, "Order fetched successfully!"))
+    return res.status(200).json({
+        success: true,
+        orders,
+    });
 })
 
 // get all orders --admin
@@ -92,9 +94,10 @@ export const allOrders = asyncHandler(async (req, res) => {
         nodeCache.set(key, JSON.stringify(orders))
     }
 
-    return res
-        .status(200)
-        .json(new ApiResponse(200, { orders }, "Order fetched successfully!"))
+    return res.status(200).json({
+        success: true,
+        orders
+    })
 })
 
 
@@ -130,9 +133,10 @@ export const processOrder = asyncHandler(async (req, res) => {
         orderId: String(order._id)
     })
 
-    return res
-        .status(200)
-        .json(new ApiResponse(200, {}, `Order ${order.status} Successfully!`))
+    return res.status(200).json({
+        success: true,
+        message: `Order ${order.status} Successfully!`
+    })
 })
 
 
@@ -154,9 +158,10 @@ export const deleteOrder = asyncHandler(async (req, res) => {
         orderId: String(order._id),
     });
 
-    return res
-        .status(200)
-        .json(new ApiResponse(200, {}, "Order deleted successfully!"))
+    return res.status(200).json({
+        success: true,
+        message: "Order Deleted Successfully",
+    });
 })
 
 
@@ -176,7 +181,8 @@ export const getSingleOrder = asyncHandler(async (req, res) => {
         nodeCache.set(key, JSON.stringify(order));
     }
 
-    return res
-        .status(200)
-        .json(new ApiResponse(200, { order }, "Order fetched successfully!"))
+    return res.status(200).json({
+        success: true,
+        order
+    })
 })

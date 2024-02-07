@@ -193,9 +193,10 @@ export const dashboardStats = asyncHandler(async (req, res) => {
         nodeCache.set(key, JSON.stringify(stats))
     }
 
-    return res
-        .status(200)
-        .json(new ApiResponse(200, { stats }, "Stats fetched successfully!"))
+    return res.status(200).json({
+        success: true,
+        stats
+    })
 })
 
 
@@ -306,9 +307,10 @@ export const pieCharts = asyncHandler(async (req, res) => {
         nodeCache.set(key, JSON.stringify(charts))
     }
 
-    return res
-        .status(200)
-        .json(new ApiResponse(200, { charts }, "Stats fetched successfully!"))
+    return res.status(200).json({
+        success: true,
+        charts
+    })
 })
 
 export const barCharts = asyncHandler(async (req, res) => {
@@ -364,16 +366,17 @@ export const barCharts = asyncHandler(async (req, res) => {
     }
 
 
-    return res
-        .status(200)
-        .json(new ApiResponse(200, { charts }, "Stats fetched successfully!"))
+    return res.status(200).json({
+        success: true,
+        charts
+    })
 })
 
 export const lineCharts = asyncHandler(async (req, res) => {
     let charts;
     const key = "admin-line-charts";
 
-    if (nodeCache.has(key)){
+    if (nodeCache.has(key)) {
         charts = JSON.parse(nodeCache.get(key) as string);
     }
     else {
@@ -420,7 +423,8 @@ export const lineCharts = asyncHandler(async (req, res) => {
         nodeCache.set(key, JSON.stringify(charts));
     }
 
-    return res
-        .status(200)
-        .json(new ApiResponse(200, { charts }, "Stats fetched successfully!"))
+    return res.status(200).json({
+        success: true,
+        charts
+    })
 })

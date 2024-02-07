@@ -24,7 +24,6 @@
   "author": "Kanai2003",
   "license": "ISC",
   "dependencies": {
-    "bcrypt": "^5.1.1",
     "cloudinary": "^2.0.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
@@ -40,7 +39,6 @@
     "validator": "^13.11.0"
   },
   "devDependencies": {
-    "@types/bcrypt": "^5.0.2",
     "@types/cookie-parser": "^1.4.6",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",

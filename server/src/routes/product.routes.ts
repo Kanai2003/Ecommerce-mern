@@ -22,7 +22,8 @@ router.route("/latest").get( latestProduct)
 
 router.get("/categories", allCategories)
 
-router.get("/admin-products", adminOnly, getAdminProducts)
+router.get("/admin-products", adminOnly, getAdminProducts);
+
 
 //To Create New Product  - /api/v1/product/new
 router.post("/new", adminOnly, singleUpload, newProduct)

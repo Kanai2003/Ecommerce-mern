@@ -3,23 +3,17 @@ import {
     register,
     getAllUser,
     getUser,
-    deleteUser,
-    loginUser,
-    logoutUser
+    deleteUser
 } from "../controllers/user.controller.js"
-import { adminOnly, verifyJWT } from "../middlewares/auth.middleware.js";
-import { singleUpload } from "../middlewares/multer.middleware.js";
+import { adminOnly } from "../middlewares/auth.middleware.js";
 
 
 const router = Router()
 
-router.post("/new", singleUpload, register)
+router.post("/new", register)
     
-router.route("/login").post(loginUser)
 
-router.route("/logout").post(verifyJWT, logoutUser)
-
-router.route("/getall").get(adminOnly, getAllUser)
+router.route("/all").get(adminOnly, getAllUser)
 
 router
     .route("/:id")
