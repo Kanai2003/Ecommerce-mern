@@ -147,17 +147,17 @@ export const deleteProduct = asyncHandler(async (req, res) => {
 
 // get latest product
 export const latestProduct = asyncHandler(async (req, res) => {
-    // const products = await Product.find({}).sort({ createdAt: -1 }).limit(10)
+    const products = await Product.find({}).sort({ createdAt: -1 }).limit(10)
+    // fix: 
+    // let products;
 
-    let products;
-
-    if (nodeCache.has("latest-products")) {
-        products = JSON.stringify(nodeCache.get("latest-products") as string)
-    } else {
-        products = await Product.find({}).sort({ createdAt: -1 }).limit(5);
-        nodeCache.set("latest-products", JSON.stringify(products))
-    }
-
+    // if (nodeCache.has("latest-products")) {
+    //     products = JSON.stringify(nodeCache.get("latest-products") as string)
+    // } else {
+    //     products = await Product.find({})
+    //     nodeCache.set("latest-products", JSON.stringify(products))
+    // }
+    console.log(products)
     return res.status(200).json({
         success: true,
         products
