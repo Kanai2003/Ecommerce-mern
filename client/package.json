@@ -26,6 +26,8 @@
     "sass": "^1.70.0"
   },
   "devDependencies": {
+    "@stripe/react-stripe-js": "^2.4.0",
+    "@stripe/stripe-js": "^2.4.0",
     "@types/react": "^18.2.43",
     "@types/react-dom": "^18.2.17",
     "@types/react-table": "^7.7.19",
