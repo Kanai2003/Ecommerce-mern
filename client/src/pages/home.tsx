@@ -1,33 +1,62 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
-import ProductCard from '../components/ProductCard'
+import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import { Link } from "react-router-dom";
+import { Skeleton } from "../components/loader";
+import ProductCard from "../components/product-card";
+import { useLatestProductsQuery } from "../redux/api/productAPI";
+import { addToCart } from "../redux/reducer/cartReducer";
+import { CartItem } from "../types/types";
 
 const Home = () => {
+  const { data, isLoading, isError } = useLatestProductsQuery("");
 
-    const addToCartHandler = () => {}
+  const dispatch = useDispatch();
+
+  const addToCartHandler = (cartItem: CartItem) => {
+    if (cartItem.stock < 1) return toast.error("Out of Stock");
+    dispatch(addToCart(cartItem));
+    toast.success("Added to cart");
+  };
+
+  if (isError) toast.error("Cannot Fetch the Products");
 
   return (
-    <div className='home'>
+    <div className="home">
       <section></section>
 
       <h1>
-        Latest Product
-        <Link to="/search" className="findmore">More</Link>
+        Latest Products
+        <Link to="/search" className="findmore">
+          More
+        </Link>
       </h1>
 
       <main>
-        <ProductCard
-          productId="id"
-          photo="https://cdn.thewirecutter.com/wp-content/media/2023/06/bestlaptops-2048px-9765.jpg?auto=webp&quality=75&crop=1.91:1&width=1200"
-          name="camera"
-          price={50000}
-          stock={1}
-          handler={addToCartHandler}
-        />
+        {isLoading ? (
+          <Skeleton width="80vw" />
+        ) : (
+          // Check if data exists and is an array before mapping
+          Array.isArray(data?.products) ? (
+            data.products.map((i) => (
+              <ProductCard
+                key={i._id}
+                productId={i._id}
+                name={i.name}
+                price={i.price}
+                stock={i.stock}
+                handler={addToCartHandler}
+                photo={i.photo}
+              />
+            ))
+          ) : (
+            // Handle case when data.products is not an array
+            <p>No products found</p>
+          )
+        )}
       </main>
 
     </div>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;

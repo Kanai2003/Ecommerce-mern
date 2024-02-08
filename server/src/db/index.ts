@@ -4,6 +4,9 @@ const connectDB = async () => {
     try {
         const connectionInstance = await mongoose.connect(
             `${process.env.MONGODB_URI}`,
+            {
+                dbName: "Ecommerce_mern",
+            }
         );
         console.log(
             `\n🔗 MONGODB connected! HOST: ${connectionInstance.connection.host}`,

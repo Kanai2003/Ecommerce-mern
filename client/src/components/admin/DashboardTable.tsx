@@ -33,6 +33,10 @@ const columns: Column<DataType>[] = [
 ];
 
 const DashboardTable = ({ data = [] }: { data: DataType[] }) => {
+  if(!data || data.length === 0){
+    return <p>No data available</p>
+  }
+  
   return TableHOC<DataType>(
     columns,
     data,
