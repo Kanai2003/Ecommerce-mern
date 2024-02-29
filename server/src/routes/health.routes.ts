@@ -1,9 +1,12 @@
 import { Router } from "express";
-import { adminOnly } from "../middlewares/auth.middleware.js";
-import { healthCheck } from "../controllers/health.controller.js";
 
-const router = Router()
+const router = Router();
 
-router.get("/", healthCheck)
+router.get("/", (req, res) => {
+    return res.status(200).json({
+        success: true,
+        message: "Everything is fine!"
+    });
+});
 
-export default router
+export default router;
