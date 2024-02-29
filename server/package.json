@@ -12,7 +12,8 @@
     "build": "tsc",
     "watch": "tsc -w",
     "dev": "npm run build && nodemon -r dotenv/config --experimental-json-modules dist/index.js",
-    "vercel-build": "echo hello"
+    "vercel-build": "echo hello", 
+    "render-build": "yarn && yarn build" 
   },
   "keywords": [
     "server",
