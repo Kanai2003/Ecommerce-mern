@@ -1,4 +1,9 @@
-import mongoose from "mongoose";
+import mongoose, { Document } from "mongoose";
+
+export interface CouponModel extends Document {
+  code: string;
+  amount: number;
+}
 
 const schema = new mongoose.Schema({
   code: {
@@ -12,4 +17,4 @@ const schema = new mongoose.Schema({
   },
 });
 
-export const Coupon = mongoose.model("Coupon", schema);
+export const Coupon = mongoose.model<CouponModel>("Coupon", schema);

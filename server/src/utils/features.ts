@@ -1,16 +1,9 @@
-import mongoose, { Document } from "mongoose";
+import mongoose, { Document, Model } from "mongoose";
 import { nodeCache } from "../app.js";
-import { Product } from "../models/product.model.js";
+import { Product, ProductDocument } from "../models/product.model.js";
 import { InvalidateCacheProps, OrderItemType } from "../types/types.js";
 
-export const connectDB = (uri: string) => {
-  mongoose
-    .connect(uri, {
-      dbName: "Ecommerce_24",
-    })
-    .then((c: any) => console.log(`DB Connected to ${c.connection.host}`))
-    .catch((e: any) => console.log(e));
-};
+
 
 export const invalidateCache = ({
   product,
@@ -19,7 +12,7 @@ export const invalidateCache = ({
   userId,
   orderId,
   productId,
-}: InvalidateCacheProps) => {
+}: InvalidateCacheProps): void => {
   if (product) {
     const productKeys: string[] = [
       "latest-products",
@@ -29,7 +22,7 @@ export const invalidateCache = ({
 
     if (typeof productId === "string") productKeys.push(`product-${productId}`);
 
-    if (typeof productId === "object")
+    if (Array.isArray(productId))
       productId.forEach((i) => productKeys.push(`product-${i}`));
 
     nodeCache.del(productKeys);
@@ -53,19 +46,19 @@ export const invalidateCache = ({
   }
 };
 
-export const reduceStock = async (orderItems: OrderItemType[]) => {
+export const reduceStock = async (orderItems: OrderItemType[]): Promise<void> => {
   for (let i = 0; i < orderItems.length; i++) {
     const order = orderItems[i];
-    const product = await Product.findById(order.productId);
+    const product: ProductDocument | null = await Product.findById(order.productId);
     if (!product) throw new Error("Product Not Found");
     product.stock -= order.quantity;
     await product.save();
   }
 };
 
-export const calculatePercentage = (thisMonth: number, lastMonth: number) => {
+export const calculatePercentage = (thisMonth: number, lastMonth: number): number => {
   if (lastMonth === 0) return thisMonth * 100;
-  const percent = (thisMonth / lastMonth) * 100;
+  const percent: number = (thisMonth / lastMonth) * 100;
   return Number(percent.toFixed(0));
 };
 
@@ -75,14 +68,14 @@ export const getInventories = async ({
 }: {
   categories: string[];
   productsCount: number;
-}) => {
-  const categoriesCountPromise = categories.map((category) =>
+}): Promise<Array<Record<string, number>>> => {
+  const categoriesCountPromise: Promise<number>[] = categories.map((category) =>
     Product.countDocuments({ category })
   );
 
-  const categoriesCount = await Promise.all(categoriesCountPromise);
+  const categoriesCount: number[] = await Promise.all(categoriesCountPromise);
 
-  const categoryCount: Record<string, number>[] = [];
+  const categoryCount: Array<Record<string, number>> = [];
 
   categories.forEach((category, i) => {
     categoryCount.push({
@@ -110,18 +103,18 @@ export const getChartData = ({
   docArr,
   today,
   property,
-}: FuncProps) => {
+}: FuncProps): number[] => {
   const data: number[] = new Array(length).fill(0);
 
   docArr.forEach((i) => {
     const creationDate = i.createdAt;
-    const monthDiff = (today.getMonth() - creationDate.getMonth() + 12) % 12;
+    const monthDiff: number = (today.getMonth() - creationDate.getMonth() + 12) % 12;
 
     if (monthDiff < length) {
       if (property) {
-        data[length - monthDiff - 1] += i[property]!;
+        data[length - monthDiff - 1] += i[property] || 0;
       } else {
-        data[length - monthDiff - 1] += 1;
+        data[length - monthDiff - 1]++;
       }
     }
   });
