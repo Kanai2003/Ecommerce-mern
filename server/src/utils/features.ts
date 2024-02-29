@@ -8,8 +8,8 @@ export const connectDB = (uri: string) => {
     .connect(uri, {
       dbName: "Ecommerce_24",
     })
-    .then((c) => console.log(`DB Connected to ${c.connection.host}`))
-    .catch((e) => console.log(e));
+    .then((c: any) => console.log(`DB Connected to ${c.connection.host}`))
+    .catch((e: any) => console.log(e));
 };
 
 export const invalidateCache = ({

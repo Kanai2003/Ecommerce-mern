@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import NodeCache from "node-cache"
 import Stripe  from "stripe";
 import morgan from "morgan"
+import * as process from "process";
 
 
 const app = express();
